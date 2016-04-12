@@ -1,0 +1,67 @@
+<Silk>
+
+<Prefixes>
+    <Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#" />
+	<Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" /> 
+	<Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#" />
+	<Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/>
+	<Prefix id="dct" namespace="http://purl.org/dc/elements/1.1/"/>
+	<Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/>
+	<Prefix id="umbel" namespace="http://umbel.org/umbel/rc/"/>
+	<Prefix id="org" namespace="http://www.w3.org/ns/org#"/>
+	<Prefix id="skos2" namespace="http://www.w3.org/2004/02/skos#"/>
+	<Prefix id="gesis" namespace="http://lod.gesis.org/lodpilot/ALLBUS/vocab.rdf#"/>
+</Prefixes>
+
+<DataSources>
+<DataSource id="openchargemap" type="sparqlEndpoint">
+  <Param name="endpointURI" value="http://lod.gesis.org/thesoz/sparql" />
+  <Param name="retryCount" value="100" />
+</DataSource>
+<DataSource id="eurostats" type="sparqlEndpoint">
+  <Param name="endpointURI" value="http://eurostat.linked-statistics.org/sparql" />
+  <Param name="retryCount" value="100" />
+</DataSource>
+</DataSources>
+  
+<Interlinks>
+    <Interlink id="concepts">
+      <LinkType>owl:sameAs</LinkType>
+      <SourceDataset dataSource="openchargemap" var="a">
+        <RestrictTo>
+          ?a rdf:type rdfs:Class
+        </RestrictTo>
+      </SourceDataset>
+
+      <TargetDataset dataSource="eurostats" var="b">
+        <RestrictTo>
+           ?b rdf:type skos2:Concept
+        </RestrictTo>
+      </TargetDataset> 
+      <LinkageRule>
+	 	  <Compare metric="levenshtein"  threshold="0.01" required="true"> 
+	  <TransformInput function="lowerCase">
+  <Input path="?a/gesis:iSOCode"/>
+  </TransformInput>
+  <TransformInput function="lowerCase">
+    <Input path="?b/skos2:notation"/>
+  </TransformInput>
+</Compare>
+      </LinkageRule>
+
+      <Filter/>
+
+      <Outputs>
+        <Output type="file" minConfidence="0.95">
+          <Param name="file" value="accepted_links.nt" />
+          <Param name="format" value="ntriples" />
+        </Output>
+        <Output type="file" maxConfidence="0.95">
+          <Param name="file" value="verify_links.nt" />
+          <Param name="format" value="ntriples" />
+        </Output>
+      </Outputs>
+    </Interlink>
+  </Interlinks>
+
+</Silk>

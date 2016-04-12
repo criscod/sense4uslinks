@@ -1,0 +1,63 @@
+<Silk>
+
+<Prefixes>
+    <Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#" />
+	<Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" />
+	<Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#" />
+	<Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/>
+	<Prefix id="dct" namespace="http://purl.org/dc/elements/1.1/"/>
+	<Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/>
+</Prefixes>
+
+<DataSources>
+<DataSource id="energieregionnrw" type="file">
+  <Param name="file" value="energieregionnrw.ttl" />
+  <Param name="format" value="TURTLE" />
+</DataSource>
+<DataSource id="dbpedia" type="sparqlEndpoint">
+  <Param name="endpointURI" value="http://dbpedia.org/sparql" />
+  <Param name="retryCount" value="100" />
+</DataSource>
+</DataSources>
+  
+<Interlinks>
+    <Interlink id="concepts">
+      <LinkType>skos:exactMatch</LinkType>
+      <SourceDataset dataSource="energieregionnrw" var="a">
+        <RestrictTo>
+          ?a rdf:type skos:Concept
+        </RestrictTo>
+      </SourceDataset>
+
+      <TargetDataset dataSource="dbpedia" var="b">
+        <RestrictTo>
+           ?b rdf:type skos:Concept
+        </RestrictTo>
+      </TargetDataset> 
+      <LinkageRule>
+	  <Compare metric="levenshtein"  threshold="0.30" required="true"> 
+	  <TransformInput function="lowerCase">
+  <Input path="?a/skos:prefLabel[@lang = 'en']"/>
+  </TransformInput>
+  <TransformInput function="lowerCase">
+    <Input path="?b/rdfs:label[@lang = 'en']"/>
+  </TransformInput>
+</Compare>
+      </LinkageRule>
+
+      <Filter/>
+
+      <Outputs>
+        <Output type="file" minConfidence="0.95">
+          <Param name="file" value="accepted_links.nt" />
+          <Param name="format" value="ntriples" />
+        </Output>
+        <Output type="file" maxConfidence="0.95">
+          <Param name="file" value="verify_links.nt" />
+          <Param name="format" value="ntriples" />
+        </Output>
+      </Outputs>
+    </Interlink>
+  </Interlinks>
+
+</Silk>
